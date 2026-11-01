@@ -1,0 +1,9 @@
+# Compiled output (build with: javac src/*.java -d bin/)
+bin/
+*.class
+
+# IDE / OS files
+.vscode/
+.idea/
+*.iml
+.DS_Store

@@ -1,6 +1,9 @@
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
+import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -11,6 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 /**
@@ -332,7 +336,6 @@ public class Window {
      * sizes accordingly to maintain readability.\n *\n * @param gridPanel the panel
      * containing the button grid\n
      */
-    \n
 
     public static void resizeButtons(JPanel gridPanel) {
         // Get the grid panel's actual size
@@ -367,7 +370,6 @@ public class Window {
      * \n * Updates the visual appearance of all buttons on the game board.\n *
      * Applies correct colors, text, and styling based on current board state.\n
      */
-    \n
 
     public static void updateVisuals() {
         for (int i = 0; i < width; i++) {
@@ -386,7 +388,6 @@ public class Window {
      * the row coordinate of the button\n * @param hovered whether the mouse is
      * currently hovering over this button\n
      */
-    \n
 
     public static void applyButtonAppearance(int x, int y, boolean hovered) {
         JButton button = buttons[x][y];
@@ -446,7 +447,6 @@ public class Window {
      * Uses traditional Minesweeper color scheme.\n *\n * @param value the number of
      * adjacent mines (1-8)\n * @return the Color to display for this number\n
      */
-    \n
 
     public static Color getNumberColor(int value) {
         switch (value) {
@@ -477,7 +477,6 @@ public class Window {
      * squares.\n * Animation runs for 6 frames (approximately 840ms) before
      * triggering game-end dialog.\n
      */
-    \n
 
     public static void startGameOverAnimation() {
         if (gameOverAnimationRunning) {
