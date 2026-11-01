@@ -18,19 +18,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 /**
- * Manages the GUI for Minesweeper using Java Swing.
- *
- * Handles:
- * - Game window creation and rendering
- * - Button grid layout and responsiveness
- * - Mouse input (left/right click)
- * - Visual updates for game state
- * - Status bar (timer, flags remaining)
- * - Game-over animations and dialogs
- * - Difficulty selection
- */
-
-/**
  * Custom layout manager that maintains a fixed aspect ratio for its component.
  * Useful for keeping the game grid square regardless of window resize.
  */
@@ -97,6 +84,8 @@ class AspectRatioLayout implements java.awt.LayoutManager {
  * Prevents the game grid from becoming distorted when the window is resized.
  */
 class AspectRatioPanel extends JPanel {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Constructs a panel with the specified aspect ratio.
      *
@@ -107,10 +96,22 @@ class AspectRatioPanel extends JPanel {
     }
 }
 
+/**
+ * Manages the GUI for Minesweeper using Java Swing.
+ *
+ * Handles:
+ * - Game window creation and rendering
+ * - Button grid layout and responsiveness
+ * - Mouse input (left/right click)
+ * - Visual updates for game state
+ * - Status bar (timer, flags remaining)
+ * - Game-over animations and dialogs
+ * - Difficulty selection
+ */
 public class Window {
     // Game state variables
-    public static JButton[][] buttons; // 2D array of button components for the game grid
-    public static Board b; // Reference to the game board logic
+    private static JButton[][] buttons; // 2D array of button components for the game grid
+    private static Board b; // Reference to the game board logic
     static int width; // Game board width in squares
     static int height; // Game board height in squares
     static int buttonSize; // Size of each button in pixels
@@ -183,6 +184,13 @@ public class Window {
         difficultyFrame.setVisible(true);
     }
 
+    /**
+     * Creates the game window and a new board for the chosen difficulty.
+     * Sizes the window and buttons to fit the screen while keeping squares
+     * square.
+     *
+     * @param difficulty 0 = Easy (12x8), 1 = Medium (18x12), 2 = Hard (27x18)
+     */
     public static void startGame(int difficulty) {
         currentDifficulty = difficulty;
         elapsedSeconds = 0;
@@ -204,7 +212,7 @@ public class Window {
             height = 18;
         }
 
-        gameFrame = new JFrame("My First Window");
+        gameFrame = new JFrame("Minesweeper");
         gameFrame.setLayout(new BorderLayout());
         createStatusBar();
 
@@ -250,7 +258,7 @@ public class Window {
                 final int finalI = i;
                 final int finalJ = j;
 
-                JButton button = new JButton("3");
+                JButton button = new JButton("");
 
                 button.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
@@ -271,12 +279,11 @@ public class Window {
                     @Override
                     public void mousePressed(MouseEvent e) {
                         if (SwingUtilities.isLeftMouseButton(e)) {
-                            b.Click(finalI, finalJ);
+                            b.click(finalI, finalJ);
                         } else if (SwingUtilities.isRightMouseButton(e)) {
-                            b.Flag(finalI, finalJ);
+                            b.flag(finalI, finalJ);
                         }
                         startTimerIfNeeded();
-                        b.printBoard();
                         updateVisuals();
                         updateStatusLabels();
                         if (b.isEnded() && !gameOverAnimationRunning) {
@@ -316,27 +323,23 @@ public class Window {
 
         // Add component listener to handle window resize
         gameFrame.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                resizeButtons(gridPanel);
+            }
+        });
 
-    @Override
-    public void componentResized(ComponentEvent e) {
-        resizeButtons(gridPanel);
+        updateVisuals();
+        gameFrame.setVisible(true);
     }
 
-    });
-
-    updateVisuals();
-
-    gameFrame.setVisible(true);
-
-    System.out.println("started");}
-
     /**
-     * \n * Recalculates button sizes when the game window is resized.\n * Ensures
-     * buttons remain square and proportional to the window size.\n * Updates font
-     * sizes accordingly to maintain readability.\n *\n * @param gridPanel the panel
-     * containing the button grid\n
+     * Recalculates button sizes when the game window is resized.
+     * Ensures buttons remain square and proportional to the window size.
+     * Updates font sizes accordingly to maintain readability.
+     *
+     * @param gridPanel the panel containing the button grid
      */
-
     public static void resizeButtons(JPanel gridPanel) {
         // Get the grid panel's actual size
         int panelWidth = gridPanel.getWidth();
@@ -367,10 +370,9 @@ public class Window {
     }
 
     /**
-     * \n * Updates the visual appearance of all buttons on the game board.\n *
-     * Applies correct colors, text, and styling based on current board state.\n
+     * Updates the visual appearance of all buttons on the game board.
+     * Applies correct colors, text, and styling based on current board state.
      */
-
     public static void updateVisuals() {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
@@ -380,18 +382,21 @@ public class Window {
     }
 
     /**
-     * \n * Applies the correct visual appearance to a single button based on its
-     * square state.\n * Handles different displays for:\n * - Hidden squares
-     * (green)\n * - Flagged squares (with flag symbol)\n * - Revealed safe squares
-     * (with number or empty)\n * - Revealed mines (with X symbol)\n * - Game-over
-     * animations\n *\n * @param x the column coordinate of the button\n * @param y
-     * the row coordinate of the button\n * @param hovered whether the mouse is
-     * currently hovering over this button\n
+     * Applies the correct visual appearance to a single button based on its
+     * square state. Handles different displays for:
+     * - Hidden squares (green)
+     * - Flagged squares (with flag symbol)
+     * - Revealed safe squares (with number or empty)
+     * - Revealed mines (with mine symbol)
+     * - Game-over animations
+     *
+     * @param x       the column coordinate of the button
+     * @param y       the row coordinate of the button
+     * @param hovered whether the mouse is currently hovering over this button
      */
-
     public static void applyButtonAppearance(int x, int y, boolean hovered) {
         JButton button = buttons[x][y];
-        Square square = b.board[x][y];
+        Square square = b.getSquare(x, y);
 
         boolean hidden = square.getHidden();
         boolean flagged = square.isFlagged();
@@ -442,12 +447,13 @@ public class Window {
     }
 
     /**
-     * \n * Returns the appropriate color for displaying a mine count number.\n *
-     * Each number (1-8) has a specific color for easy visual identification.\n *
-     * Uses traditional Minesweeper color scheme.\n *\n * @param value the number of
-     * adjacent mines (1-8)\n * @return the Color to display for this number\n
+     * Returns the appropriate color for displaying a mine count number.
+     * Each number (1-8) has a specific color for easy visual identification,
+     * following the traditional Minesweeper color scheme.
+     *
+     * @param value the number of adjacent mines (1-8)
+     * @return the Color to display for this number
      */
-
     public static Color getNumberColor(int value) {
         switch (value) {
             case 1:
@@ -472,12 +478,11 @@ public class Window {
     }
 
     /**
-     * \n * Starts the game-over animation sequence.\n * Disables button interaction
-     * and plays a flashing animation\n * highlighting either winning or losing
-     * squares.\n * Animation runs for 6 frames (approximately 840ms) before
-     * triggering game-end dialog.\n
+     * Starts the game-over animation sequence.
+     * Disables button interaction and plays a flashing animation highlighting
+     * either winning or losing squares. The animation runs for 6 frames
+     * (approximately 840ms) before showing the game-end dialog.
      */
-
     public static void startGameOverAnimation() {
         if (gameOverAnimationRunning) {
             return;
@@ -524,7 +529,7 @@ public class Window {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 JButton button = buttons[i][j];
-                Square square = b.board[i][j];
+                Square square = b.getSquare(i, j);
 
                 boolean hidden = square.getHidden();
                 boolean mine = square.getIsMine();

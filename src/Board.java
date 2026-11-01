@@ -8,7 +8,7 @@
  * - Mine placement and safe first click guarantee
  */
 public class Board {
-    public Square[][] board;
+    private Square[][] board;
     private int width;
     private int height;
     private int numMines;
@@ -83,7 +83,7 @@ public class Board {
      * @param x the column coordinate of the clicked square
      * @param y the row coordinate of the clicked square
      */
-    public void Click(int x, int y) {
+    public void click(int x, int y) {
         // Ignore clicks if the game has already ended
         if (gameEnded) {
             return;
@@ -123,7 +123,7 @@ public class Board {
                     if (a == 0 && b == 0) {
                         continue;
                     }
-                    Click(x + a, y + b);
+                    click(x + a, y + b);
                 }
             }
             checkForWin();
@@ -143,7 +143,7 @@ public class Board {
      * @param x the column coordinate of the square to flag/unflag
      * @param y the row coordinate of the square to flag/unflag
      */
-    public void Flag(int x, int y) {
+    public void flag(int x, int y) {
         // Ignore flag attempts if the game has ended
         if (gameEnded) {
             return;
@@ -187,6 +187,17 @@ public class Board {
             }
             System.out.println();
         }
+    }
+
+    /**
+     * Returns the square at the given coordinates.
+     *
+     * @param x the column coordinate
+     * @param y the row coordinate
+     * @return the Square at (x, y)
+     */
+    public Square getSquare(int x, int y) {
+        return board[x][y];
     }
 
     /**

@@ -4,6 +4,8 @@ A desktop Minesweeper game written in Java using Swing. It has three difficulty 
 
 This was my final project for AP Computer Science A.
 
+![Minesweeper gameplay on Easy](docs/screenshot.png)
+
 ## Features
 - Three difficulty presets: Easy (12×8), Medium (18×12), Hard (27×18)
 - Safe first click (the first revealed square is never a mine)
